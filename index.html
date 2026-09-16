@@ -10,7 +10,7 @@
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{color:#065f46;margin:8px 0;font-size:28px}.muted{color:var(--muted);font-size:13px}
 input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin:5px 0 12px;font:inherit}textarea{min-height:100px}
 button{border:0;border-radius:10px;padding:11px 15px;background:var(--p);color:white;font-weight:bold;cursor:pointer}button.secondary{background:#2563eb}button.gray{background:#64748b}button.danger{background:#dc2626}
-.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.user{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#d1fae5}.avatar.initials{display:inline-flex;align-items:center;justify-content:center;background:#047857;color:#fff;font-weight:700;font-size:15px;text-transform:uppercase}.disc{border:1px solid var(--border);padding:16px;border-radius:14px;margin-top:12px;background:#f8fafc}.reply{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px;margin-top:8px;border-radius:8px}.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.user{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#d1fae5}.disc{border:1px solid var(--border);padding:16px;border-radius:14px;margin-top:12px;background:#f8fafc}.reply{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px;margin-top:8px;border-radius:8px}.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -27,10 +27,10 @@ button{border:0;border-radius:10px;padding:11px 15px;background:var(--p);color:w
 <input id="phone" placeholder="Telephone">
 <input id="email" type="email" placeholder="Email">
 <input id="username" placeholder="Username">
-<input id="regPin" type="password"  placeholder="PIN (inyuguti + imibare, 6-20)">
+<input id="regPin" type="password" inputmode="numeric" placeholder="PIN (4-8 digits)">
 </div>
 <input id="identity" class="hidden" placeholder="Username cyangwa telephone">
-<input id="loginPin" class="hidden" type="password"  placeholder="PIN">
+<input id="loginPin" class="hidden" type="password" inputmode="numeric" placeholder="PIN">
 <button onclick="submitAuth()" id="authBtn">Register</button>
 <button class="gray" onclick="toggleAuth()" id="switchBtn">Mfite konti: Login</button>
 </div>
@@ -43,8 +43,6 @@ button{border:0;border-radius:10px;padding:11px 15px;background:var(--p);color:w
 <button class="gray" onclick="closeSettings()">Close</button>
 </div>
 
-<div id="adminPanel" class="card hidden"><div class="top"><h2>Admin Panel</h2><button class="secondary" onclick="loadAdmin()">Refresh</button></div><div id="adminUsers">Loading...</div><hr><h3>Ohereza announcement kuri email</h3><input id="annSubject" placeholder="Subject"><textarea id="annBody" placeholder="Andika announcement..." maxlength="10000"></textarea><button onclick="sendAnnouncement()">Ohereza kuri bose</button><div id="annResult" class="small"></div></div>
-<div id="removalNotice" class="card hidden"><h3>Abakuwe ku rubuga</h3><div id="removals"></div></div>
 <div id="app" class="hidden">
 <div class="card">
 <h2>Ohereza ubutumwa bushya</h2>
@@ -56,34 +54,10 @@ button{border:0;border-radius:10px;padding:11px 15px;background:var(--p);color:w
 </div>
 </div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZtnvBNNHTGMuRtF6BFa9vBT8R6iZ4xccNS5sBQRNgm5c/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZtnVbNNHTGMuRtF6BFa9vBT8R6iZ4xccNS5sBQRNgm5c/exec";
 let token=localStorage.getItem("nashoToken")||"", user=JSON.parse(localStorage.getItem("nashoUser")||"null"), registerMode=true;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-
-function initials(name){
-  const words=String(name||"User").trim().split(/\s+/).filter(Boolean);
-  if(!words.length)return "U";
-  return (words.length===1?words[0].slice(0,2):words[0][0]+words[words.length-1][0]).toUpperCase();
-}
-function avatarHtml(photo,name){
-  if(photo)return `<img class="avatar" src="${esc(photo)}" alt="${esc(name||"User")}" onerror="this.outerHTML=avatarInitialHtml('${esc(name||"User")}')">`;
-  return avatarInitialHtml(name);
-}
-function avatarInitialHtml(name){return `<span class="avatar initials" aria-label="${esc(name||"User")}">${esc(initials(name))}</span>`;}
-
-// Kwerekana itariki n'isaha ukoresheje GMT+2 (Africa/Kigali).
-function formatTime(value){
-  if(!value)return "";
-  const date=new Date(value);
-  if(Number.isNaN(date.getTime()))return String(value);
-  return new Intl.DateTimeFormat("rw-RW",{
-    timeZone:"Africa/Kigali",
-    year:"numeric",month:"2-digit",day:"2-digit",
-    hour:"2-digit",minute:"2-digit",second:"2-digit",
-    hour12:false
-  }).format(date)+" (GMT+2)";
-}
 async function api(action,data={}){
   try{
     const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...data})});
@@ -103,9 +77,9 @@ async function submitAuth(){
       $("authBtn").disabled=false; $("authBtn").textContent="Register";
       return alert("Uzuza ibisabwa byose.");
     }
-    if(!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/.test(pin)){
+    if(!/^\d{4,8}$/.test(pin)){
       $("authBtn").disabled=false; $("authBtn").textContent="Register";
-      return alert("PIN igomba kuba inyuguti n’imibare 6-20.");
+      return alert("PIN igomba kuba imibare 4 kugeza kuri 8.");
     }
     r=await api("register",{fullName,phone,email,username,pin});
   }else{
@@ -114,18 +88,12 @@ async function submitAuth(){
   $("authBtn").disabled=false;
   $("authBtn").textContent=registerMode?"Register":"Login";
   if(!r.success)return alert(r.message||"Igikorwa cyananiwe.");
-  if(r.pending){alert(r.message||"Tegereza permission ya admin.");toggleAuth();return;}
   token=r.token; user=r.user;
   localStorage.setItem("nashoToken",token);
   localStorage.setItem("nashoUser",JSON.stringify(user));
   showApp();
 }
-function showApp(){
-  $("auth").classList.add("hidden");$("app").classList.remove("hidden");
-  $("welcome").textContent="Murakaza neza, "+(user?.username||"");
-  if(user?.isAdmin){$("adminPanel").classList.remove("hidden");loadAdmin()}
-  loadRemovals();load()
-}
+function showApp(){$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("welcome").textContent="Murakaza neza, "+(user?.username||"");load()}
 async function logout(){if(token)await api("logout",{token});token="";user=null;localStorage.removeItem("nashoToken");localStorage.removeItem("nashoUser");location.reload()}
 function openSettings(){$("profile").classList.remove("hidden");$("newUsername").value=user?.username||"";$("photoUrl").value=user?.photoUrl||""}
 function closeSettings(){$("profile").classList.add("hidden")}
@@ -137,20 +105,10 @@ async function load(){
   try{
     let r=await fetch(API_URL+"?action=getDiscussions");
     let d=await r.json();
-    if(!d.success)return $("feed").textContent=d.message||"Nta makuru yabonetse.";$("feed").innerHTML=d.discussions.map(x=>`<div class="disc"><div class="user">${avatarHtml(x.photoUrl,x.username)}<div><b>${esc(x.username)}</b><div class="small">${esc(formatTime(x.timestamp))}</div></div></div><p id="msg_${esc(x.id)}">${esc(x.message)}</p>${(x.userId===user?.userId||user?.isAdmin)?`<div class="actions">${x.userId===user?.userId?`<button class="secondary" onclick="editMsg('${esc(x.id)}')">Edit</button>`:""}<button class="danger" onclick="deleteMsg('${esc(x.id)}')">Siba</button></div>`:""}${(x.attachments||[]).map(a=>`<p><a href="${esc(a.url)}" target="_blank">${esc(a.name)}</a></p>`).join("")}${(x.replies||[]).map(y=>`<div class="reply"><b>${esc(y.username)}</b>: ${esc(y.reply)}<div class="small">${esc(formatTime(y.timestamp))}</div></div>`).join("")}<div class="row"><input id="rep_${esc(x.id)}" placeholder="Andika igisubizo..."><button onclick="reply('${esc(x.id)}')">Subiza</button></div></div>`).join("")||"Nta butumwa buraboneka.";
+    if(!d.success)return $("feed").textContent=d.message||"Nta makuru yabonetse.";$("feed").innerHTML=d.discussions.map(x=>`<div class="disc"><div class="user"><img class="avatar" src="${esc(x.photoUrl||"https://via.placeholder.com/42")}"><div><b>${esc(x.username)}</b><div class="small">${esc(x.timestamp)}</div></div></div><p>${esc(x.message)}</p>${(x.attachments||[]).map(a=>`<p><a href="${esc(a.url)}" target="_blank">${esc(a.name)}</a></p>`).join("")}${(x.replies||[]).map(y=>`<div class="reply"><b>${esc(y.username)}</b>: ${esc(y.reply)}<div class="small">${esc(y.timestamp)}</div></div>`).join("")}<div class="row"><input id="rep_${esc(x.id)}" placeholder="Andika igisubizo..."><button onclick="reply('${esc(x.id)}')">Subiza</button></div></div>`).join("")||"Nta butumwa buraboneka.";
   }catch(e){$("feed").textContent="Kubona ibiganiro byanze: "+e.message;}
 }
 async function reply(id){let input=$("rep_"+id),reply=input.value.trim();if(!reply)return;let r=await api("replyDiscussion",{token,discussionId:id,reply});if(!r.success)return alert(r.message);input.value="";load()}
-async function loadAdmin(){
-  const r=await api("adminUsers",{token}); if(!r.success)return $("adminUsers").textContent=r.message;
-  $("adminUsers").innerHTML=r.users.map(u=>`<div class="disc"><b>${esc(u.fullName)}</b> (@${esc(u.username)})<div class="small">${esc(u.status)} | ${esc(u.email)}</div>${u.status==="Pending"?`<button class="secondary" onclick="approveUser('${esc(u.userId)}')">Ha permission</button>`:u.status==="Active"?`<button class="danger" onclick="removeUser('${esc(u.userId)}','${esc(u.username)}')">Kuraho</button>`:`<span class="small">Ntabwo akora</span>`}</div>`).join("")||"Nta bakoresha.";
-}
-async function sendAnnouncement(){const subject=$("annSubject").value.trim(),body=$("annBody").value.trim();if(!subject||!body)return alert("Subject na message birakenewe.");const r=await api("adminAnnouncement",{token,subject,body});$("annResult").textContent=r.message||"";if(r.success){$("annSubject").value="";$("annBody").value="";}}
-async function approveUser(id){const r=await api("adminApproveUser",{token,userId:id});alert(r.message||"");if(r.success)loadAdmin()}
-async function editMsg(id){const el=$("msg_"+id);const value=prompt("Hindura ubutumwa:",el.textContent);if(value===null)return;const r=await api("editDiscussion",{token,discussionId:id,message:value});if(!r.success)return alert(r.message);load()}
-async function deleteMsg(id){if(!confirm("Urashaka gusiba ubu butumwa?"))return;const r=await api("deleteDiscussion",{token,discussionId:id});if(!r.success)return alert(r.message);load()}
-async function removeUser(id,name){const reason=prompt("Impamvu yo gukuraho "+name+":");if(reason===null)return;const r=await api("adminRemoveUser",{token,userId:id,reason});alert(r.message||"");if(r.success){loadAdmin();loadRemovals();load()}}
-async function loadRemovals(){const r=await fetch(API_URL+"?action=getRemovals");const d=await r.json();if(!d.success||!d.removals.length)return;$("removalNotice").classList.remove("hidden");$("removals").innerHTML=d.removals.map(x=>`<div class="small">@${esc(x.username)} yakuwe na ${esc(x.removedBy)} — ${esc(x.reason)} — ${esc(formatTime(x.createdAt))}</div>`).join("")}
 function changeLang(v){localStorage.setItem("nashoLanguage",v);/* Add translation labels here if needed. */}
 if(token&&user)showApp();else $("auth").classList.remove("hidden");
 </script>
