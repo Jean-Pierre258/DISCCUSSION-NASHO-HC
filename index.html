@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASHO HEALTH CENTER | Ibiganiro (Discussions)</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+      display: grid;
+      gap: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: #065f46;
+      margin: 0 0 10px 0;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    label { font-weight: 600; font-size: 14px; }
+    input, textarea {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+    .btn {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .disc-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .disc-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .disc-name { font-weight: bold; color: #1e293b; }
+    .disc-time { font-size: 12px; color: #64748b; }
+    .disc-message { margin-bottom: 15px; line-height: 1.5; }
+    .disc-replies {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .reply-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .reply-form input { flex: 1; min-width: 150px; }
+    .toast-container { position: fixed; bottom: 20px; right: 20px; }
+    .toast {
+      background: #0f172a; color: white; padding: 12px 20px; border-radius: 8px;
+      margin-top: 10px; display: flex; align-items: center; gap: 10px;
+    }
+    .toast.success { background: #059669; }
+    .toast.error { background: #dc2626; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header card">
+      <h1>NASHO HEALTH CENTER</h1>
+      <p>Ibiganiro Byihariye (Testing Discussion Board)</p>
+    </div>
+
+    <!-- Igice cyo Kwandika Ubutumwa Bushya -->
+    <div class="card">
+      <h3 style="margin-top:0;">Ohereza Ubutumwa Bushya</h3>
+      <form id="postForm" onsubmit="postMessage(event)">
+        <div class="form-group">
+          <label>Amazina yawe *</label>
+          <input type="text" id="senderName" required placeholder="Urugero: Jean Pierre">
+        </div>
+        <div class="form-group">
+          <label>Telefone *</label>
+          <input type="tel" id="senderPhone" required placeholder="0788 000 000">
+        </div>
+        <div class="form-group">
+          <label>Ubutumwa *</label>
+          <textarea id="senderMessage" rows="3" required placeholder="Andika ubutumwa bwawe hano..."></textarea>
+        </div>
+        <button type="submit" class="btn" id="btnPost"><i data-lucide="send"></i> Ohereza</button>
+      </form>
+    </div>
+
+    <!-- Igice Cyerekana Ubutumwa Bwasohotse (Feed) -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin-top:0;">Ibiganiro Byatanzwe</h3>
+        <button class="btn" style="background:#3b82f6;" onclick="loadDiscussions()"><i data-lucide="refresh-cw"></i> Vugurura</button>
+      </div>
+      <div id="feed" style="margin-top:20px;">
+        <p style="text-align:center; color:#64748b;">Turimo gushaka ubutumwa muri Sheets...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // URL NSHYA WAMBAYE IGOBOTSE HO!
+    const API_URL = "https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZtnVbNNHTGMuRtF6BFa9vBT8R6iZ4xccNS5sBQRNgm5c/exec";
+    
+    let discussions = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadDiscussions();
+    });
+
+    function showToast(msg, type="info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle'}"></i><span>${msg}</span>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // FUNCTION YA JSONP YO KUVUGANA NA GOOGLE SHEETS 100% NTA GUKUMIRWA (NO CORS ERROR)
+    function fetchGasJsonp(params) {
+      return new Promise((resolve, reject) => {
+        const cbName = "nashoCb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        const script = document.createElement("script");
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([k, v]) => query.set(k, String(v ?? "")));
+        query.set("callback", cbName);
+        
+        let done = false;
+        const timer = setTimeout(() => { if (!done) { done = true; reject(new Error("Timeout")); } }, 25000);
+        
+        window[cbName] = (data) => {
+          if (!done) { done = true; clearTimeout(timer); resolve(data); }
+        };
+        script.onerror = () => { if (!done) { done = true; clearTimeout(timer); reject(new Error("Network Error")); } };
+        
+        script.src = API_URL + "?" + query.toString();
+        document.head.appendChild(script);
+      });
+    }
+
+    // KUZANA UBUTUMWA BURI MURI SHEET
+    async function loadDiscussions() {
+      document.getElementById("feed").innerHTML = `<p style="text-align:center; color:#64748b;">Turimo gushaka ubutumwa muri Sheets...</p>`;
+      try {
+        const res = await fetchGasJsonp({ action: "getDiscussions" });
+        if (res && res.success) {
+          discussions = res.discussions;
+          renderFeed();
+        } else {
+          showToast("Habaye ikibazo mu kuzana amakuru.", "error");
+        }
+      } catch (err) {
+        showToast("Ntabwo byakunze, reba internet yawe.", "error");
+      }
+    }
+
+    // KWEREKANA UBUTUMWA
+    function renderFeed() {
+      const feed = document.getElementById("feed");
+      if (discussions.length === 0) {
+        feed.innerHTML = `<p style="text-align:center; color:#64748b;">Nta butumwa buratangwa.</p>`;
+        return;
+      }
+
+      feed.innerHTML = discussions.map(d => {
+        const hasReply = d.reply && d.reply.trim() !== "";
+        return `
+          <div class="disc-item">
+            <div class="disc-header">
+              <div>
+                <div class="disc-name">${escapeHtml(d.name)}</div>
+                <div class="disc-time">${escapeHtml(d.phone)}</div>
+              </div>
+              <div class="disc-time">${escapeHtml(d.timestamp)}</div>
+            </div>
+            <div class="disc-message">${escapeHtml(d.message)}</div>
+            
+            ${hasReply ? `<div class="disc-replies"><strong>Ibisubizo Byatanzwe:</strong><br>${escapeHtml(d.reply)}</div>` : ''}
+            
+            <div class="reply-form">
+              <input type="text" id="replyName_${d.id}" placeholder="Izina ryawe (Umusubiza)...">
+              <input type="text" id="replyText_${d.id}" placeholder="Andika igisubizo hano...">
+              <button class="btn" style="padding: 8px 15px; font-size: 13px;" onclick="replyMessage('${d.id}')">Subiza</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // KOHEREZA UBUTUMWA BUSHYA
+    async function postMessage(e) {
+      e.preventDefault();
+      const name = document.getElementById("senderName").value.trim();
+      const phone = document.getElementById("senderPhone").value.trim();
+      const msg = document.getElementById("senderMessage").value.trim();
+      const btn = document.getElementById("btnPost");
+
+      btn.disabled = true;
+      btn.innerHTML = "Kohereza...";
+
+      try {
+        const res = await fetchGasJsonp({
+          action: "postDiscussion",
+          name: name,
+          phone: phone,
+          message: msg
+        });
+
+        if (res && res.success) {
+          showToast("Ubutumwa bwawe bwoherejwe muri Sheets!", "success");
+          document.getElementById("senderMessage").value = "";
+          loadDiscussions(); 
+        } else {
+          showToast(res.message || "Habaye ikibazo.", "error");
+        }
+      } catch (err) {
+        showToast("Byanze kohereza.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send"></i> Ohereza`;
+        lucide.createIcons();
+      }
+    }
+
+    // GUSUBIZA MESSAGE (REPLY)
+    async function replyMessage(discId) {
+      const nameInput = document.getElementById("replyName_" + discId).value.trim();
+      const textInput = document.getElementById("replyText_" + discId).value.trim();
+
+      if (!nameInput || !textInput) {
+        showToast("Banza wandike izina ryawe n'igisubizo ushaka gutanga.", "error");
+        return;
+      }
+
+      const target = discussions.find(d => d.id === discId);
+      if (!target) return;
+
+      const appendedReply = "[" + nameInput + "]: " + textInput;
+      const fullReply = target.reply ? target.reply + "\n\n" + appendedReply : appendedReply;
+
+      target.reply = fullReply;
+      renderFeed(); 
+
+      try {
+        const res = await fetchGasJsonp({
+          action: "replyDiscussion",
+          id: discId,
+          reply: fullReply,
+          replyName: nameInput
+        });
+
+        if (res && res.success) {
+          showToast("Igisubizo cyagiye neza muri Sheets!", "success");
+        } else {
+          showToast(res.message || "Habaye ikibazo.", "error");
+        }
+      } catch (err) {
+        showToast("Byanze kohereza igisubizo.", "error");
+      }
+    }
+  </script>
+</body>
+</html>
