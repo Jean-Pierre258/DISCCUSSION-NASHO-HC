@@ -58,9 +58,41 @@ const API_URL="https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZt
 let token=localStorage.getItem("nashoToken")||"", user=JSON.parse(localStorage.getItem("nashoUser")||"null"), registerMode=true;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-async function api(action,data={}){const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...data})});return r.json()}
+async function api(action,data={}){
+  try{
+    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...data})});
+    const text=await r.text();
+    try{return JSON.parse(text)}
+    catch(e){return {success:false,message:"API ntiyagaruye JSON. Reba Web app deployment na access ya Anyone."}}
+  }catch(e){return {success:false,message:"Ntibyashobotse guhuza na server: "+e.message}}
+}
 function toggleAuth(){registerMode=!registerMode;$("registerFields").classList.toggle("hidden",!registerMode);$("identity").classList.toggle("hidden",registerMode);$("loginPin").classList.toggle("hidden",registerMode);$("authTitle").textContent=registerMode?"Iyandikishe":"Login";$("authBtn").textContent=registerMode?"Register":"Login";$("switchBtn").textContent=registerMode?"Mfite konti: Login":"Nta konti mfite: Register"}
-async function submitAuth(){let r;if(registerMode)r=await api("register",{fullName:$("fullName").value,phone:$("phone").value,email:$("email").value,username:$("username").value,pin:$("regPin").value});else r=await api("login",{identity:$("identity").value,pin:$("loginPin").value});if(!r.success)return alert(r.message);token=r.token;user=r.user;localStorage.setItem("nashoToken",token);localStorage.setItem("nashoUser",JSON.stringify(user));showApp()}
+async function submitAuth(){
+  $("authBtn").disabled=true;
+  $("authBtn").textContent="Birategere...";
+  let r;
+  if(registerMode){
+    const fullName=$("fullName").value.trim(), phone=$("phone").value.trim(), email=$("email").value.trim(), username=$("username").value.trim(), pin=$("regPin").value.trim();
+    if(!fullName||!phone||!email||!username||!pin){
+      $("authBtn").disabled=false; $("authBtn").textContent="Register";
+      return alert("Uzuza ibisabwa byose.");
+    }
+    if(!/^\d{4,8}$/.test(pin)){
+      $("authBtn").disabled=false; $("authBtn").textContent="Register";
+      return alert("PIN igomba kuba imibare 4 kugeza kuri 8.");
+    }
+    r=await api("register",{fullName,phone,email,username,pin});
+  }else{
+    r=await api("login",{identity:$("identity").value.trim(),pin:$("loginPin").value.trim()});
+  }
+  $("authBtn").disabled=false;
+  $("authBtn").textContent=registerMode?"Register":"Login";
+  if(!r.success)return alert(r.message||"Igikorwa cyananiwe.");
+  token=r.token; user=r.user;
+  localStorage.setItem("nashoToken",token);
+  localStorage.setItem("nashoUser",JSON.stringify(user));
+  showApp();
+}
 function showApp(){$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("welcome").textContent="Murakaza neza, "+(user?.username||"");load()}
 async function logout(){if(token)await api("logout",{token});token="";user=null;localStorage.removeItem("nashoToken");localStorage.removeItem("nashoUser");location.reload()}
 function openSettings(){$("profile").classList.remove("hidden");$("newUsername").value=user?.username||"";$("photoUrl").value=user?.photoUrl||""}
@@ -68,7 +100,14 @@ function closeSettings(){$("profile").classList.add("hidden")}
 async function saveProfile(){let r=await api("profile",{token,username:$("newUsername").value,photoUrl:$("photoUrl").value});if(!r.success)return alert(r.message);user=r.user;localStorage.setItem("nashoUser",JSON.stringify(user));closeSettings();showApp()}
 async function postMessage(){let message=$("message").value.trim();if(!message)return alert("Andika ubutumwa.");let r=await api("postDiscussion",{token,message});if(!r.success)return alert(r.message);let f=$("file").files[0];if(f){if(f.size>8*1024*1024)return alert("File irenze 8 MB.");let base64=await toBase64(f);let u=await api("uploadAttachment",{token,discussionId:r.id,fileName:f.name,mimeType:f.type,base64:base64.split(",")[1]});if(!u.success)alert(u.message)}$("message").value="";$("file").value="";load()}
 function toBase64(file){return new Promise((res,rej)=>{let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
-async function load(){let r=await fetch(API_URL+"?action=getDiscussions");let d=await r.json();if(!d.success)return $("feed").textContent=d.message;$("feed").innerHTML=d.discussions.map(x=>`<div class="disc"><div class="user"><img class="avatar" src="${esc(x.photoUrl||"https://via.placeholder.com/42")}"><div><b>${esc(x.username)}</b><div class="small">${esc(x.timestamp)}</div></div></div><p>${esc(x.message)}</p>${(x.attachments||[]).map(a=>`<p><a href="${esc(a.url)}" target="_blank">${esc(a.name)}</a></p>`).join("")}${(x.replies||[]).map(y=>`<div class="reply"><b>${esc(y.username)}</b>: ${esc(y.reply)}<div class="small">${esc(y.timestamp)}</div></div>`).join("")}<div class="row"><input id="rep_${esc(x.id)}" placeholder="Andika igisubizo..."><button onclick="reply('${esc(x.id)}')">Subiza</button></div></div>`).join("")||"Nta butumwa buraboneka."}
+async function load(){
+  $("feed").textContent="Loading...";
+  try{
+    let r=await fetch(API_URL+"?action=getDiscussions");
+    let d=await r.json();
+    if(!d.success)return $("feed").textContent=d.message||"Nta makuru yabonetse.";$("feed").innerHTML=d.discussions.map(x=>`<div class="disc"><div class="user"><img class="avatar" src="${esc(x.photoUrl||"https://via.placeholder.com/42")}"><div><b>${esc(x.username)}</b><div class="small">${esc(x.timestamp)}</div></div></div><p>${esc(x.message)}</p>${(x.attachments||[]).map(a=>`<p><a href="${esc(a.url)}" target="_blank">${esc(a.name)}</a></p>`).join("")}${(x.replies||[]).map(y=>`<div class="reply"><b>${esc(y.username)}</b>: ${esc(y.reply)}<div class="small">${esc(y.timestamp)}</div></div>`).join("")}<div class="row"><input id="rep_${esc(x.id)}" placeholder="Andika igisubizo..."><button onclick="reply('${esc(x.id)}')">Subiza</button></div></div>`).join("")||"Nta butumwa buraboneka.";
+  }catch(e){$("feed").textContent="Kubona ibiganiro byanze: "+e.message;}
+}
 async function reply(id){let input=$("rep_"+id),reply=input.value.trim();if(!reply)return;let r=await api("replyDiscussion",{token,discussionId:id,reply});if(!r.success)return alert(r.message);input.value="";load()}
 function changeLang(v){localStorage.setItem("nashoLanguage",v);/* Add translation labels here if needed. */}
 if(token&&user)showApp();else $("auth").classList.remove("hidden");
