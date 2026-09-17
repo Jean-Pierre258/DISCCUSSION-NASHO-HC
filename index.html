@@ -1,116 +1,2487 @@
+
 <!DOCTYPE html>
 <html lang="rw">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NASHO HEALTH CENTER | Discussion Board</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NASHO Health Center | Discussion Board</title>
+
 <style>
-:root{--p:#059669;--pd:#047857;--bg:#f1f5f9;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0}
-*{box-sizing:border-box}body{margin:0;padding:14px;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
-.container{max-width:900px;margin:auto;display:grid;gap:16px}.card{background:var(--card);padding:22px;border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 25px #0f172a0b}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{color:#065f46;margin:8px 0;font-size:28px}.muted{color:var(--muted);font-size:13px}
-input,textarea,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin:5px 0 12px;font:inherit}textarea{min-height:100px}
-button{border:0;border-radius:10px;padding:11px 15px;background:var(--p);color:white;font-weight:bold;cursor:pointer}button.secondary{background:#2563eb}button.gray{background:#64748b}button.danger{background:#dc2626}
-.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.user{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#d1fae5}.disc{border:1px solid var(--border);padding:16px;border-radius:14px;margin-top:12px;background:#f8fafc}.reply{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px;margin-top:8px;border-radius:8px}.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}
+:root{
+  --primary:#059669;
+  --primaryDark:#047857;
+  --blue:#2563eb;
+  --red:#dc2626;
+  --orange:#d97706;
+  --gray:#64748b;
+  --bg:#f1f5f9;
+  --card:#fff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --greenLight:#ecfdf5;
+  --yellowLight:#fffbeb;
+  --redLight:#fef2f2;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:16px;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 16px;
+  color:white;
+  background:var(--primary);
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  margin:6px 0 12px;
+  font:inherit;
+  background:white;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 8px 25px #0f172a0b;
+  margin-bottom:16px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.logoTitle{
+  color:#065f46;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.row>*{
+  flex:1;
+}
+
+.gray{background:var(--gray)}
+.blue{background:var(--blue)}
+.red{background:var(--red)}
+.orange{background:var(--orange)}
+
+.center{
+  text-align:center;
+}
+
+.roleGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  max-width:800px;
+  margin:30px auto;
+}
+
+.roleCard{
+  border:2px solid var(--border);
+  border-radius:20px;
+  padding:35px 25px;
+  text-align:center;
+  background:white;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.roleCard:hover{
+  border-color:var(--primary);
+  transform:translateY(-3px);
+  box-shadow:0 10px 25px #00000012;
+}
+
+.roleIcon{
+  font-size:55px;
+  margin-bottom:15px;
+}
+
+.roleCard h2{
+  margin:8px 0;
+}
+
+.authBox{
+  max-width:500px;
+  margin:20px auto;
+}
+
+.statusBox{
+  text-align:center;
+  padding:30px;
+  border-radius:15px;
+  background:var(--yellowLight);
+  border:1px solid #f59e0b;
+}
+
+.successBox{
+  padding:15px;
+  border-radius:12px;
+  background:var(--greenLight);
+  border:1px solid #10b981;
+}
+
+.errorBox{
+  padding:15px;
+  border-radius:12px;
+  background:var(--redLight);
+  border:1px solid #ef4444;
+}
+
+.pendingIcon{
+  font-size:55px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.stat{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:18px;
+}
+
+.statNumber{
+  font-size:30px;
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#d1fae5;
+}
+
+.disc{
+  border:1px solid var(--border);
+  padding:16px;
+  border-radius:14px;
+  margin-top:12px;
+  background:#f8fafc;
+}
+
+.reply{
+  background:#eff6ff;
+  border-left:4px solid #3b82f6;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+}
+
+.small{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.pendingBadge{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.approvedBadge{
+  background:#d1fae5;
+  color:#065f46;
+}
+
+.rejectedBadge{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.hiddenBadge{
+  background:#e2e8f0;
+  color:#334155;
+}
+
+.tableWrap{
+  overflow:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  text-align:left;
+  padding:11px;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+
+th{
+  background:#f8fafc;
+}
+
+.adminDiscussion{
+  border:1px solid var(--border);
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+@media(max-width:800px){
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .roleGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:500px){
+
+  body{
+    padding:9px;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .logoTitle{
+    font-size:22px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="container">
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
 <div class="card">
-<div class="top"><div><div class="muted">NASHO HEALTH CENTER</div><h1>Discussion Board</h1><div class="muted" id="welcome">Ibiganiro by'abakoresha</div></div>
-<div class="actions"><select id="lang" onchange="changeLang(this.value)"><option value="rw">Kinyarwanda</option><option value="en">English</option><option value="fr">Français</option></select><button class="gray" onclick="openSettings()">⚙ Settings</button><button class="danger" onclick="logout()">Logout</button></div></div>
+
+<div class="top">
+
+<div>
+<div class="muted">NASHO HEALTH CENTER</div>
+<div class="logoTitle">Discussion Board</div>
+<div class="muted" id="headerText">
+Ibiganiro by'abakoresha
+</div>
 </div>
 
-<div id="auth" class="card">
-<h2 id="authTitle">Iyandikishe</h2>
+<div class="actions">
+
+<select id="language"
+onchange="changeLanguage(this.value)"
+style="width:auto;margin:0">
+
+<option value="rw">Kinyarwanda</option>
+<option value="en">English</option>
+<option value="fr">Français</option>
+
+</select>
+
+<button
+id="headerSettings"
+class="gray hidden"
+onclick="openSettings()">
+⚙ Settings
+</button>
+
+<button
+id="headerLogout"
+class="red hidden"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     ROLE SELECTION
+====================================================== -->
+
+<div id="rolePage" class="card center">
+
+<h1>Murakaza neza</h1>
+
+<p class="muted">
+Hitamo uburyo ushaka gukoresha urubuga.
+</p>
+
+<div class="roleGrid">
+
+<div class="roleCard"
+onclick="selectRole('user')">
+
+<div class="roleIcon">👤</div>
+
+<h2>User</h2>
+
+<p class="muted">
+Register cyangwa Login nk'umukoresha.
+</p>
+
+<button>
+Komeza nka User
+</button>
+
+</div>
+
+
+<div class="roleCard"
+onclick="selectRole('admin')">
+
+<div class="roleIcon">🔐</div>
+
+<h2>Admin</h2>
+
+<p class="muted">
+Injira muri Admin Dashboard.
+</p>
+
+<button class="blue">
+Komeza nka Admin
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     USER AUTH
+====================================================== -->
+
+<div id="userAuthPage"
+class="card hidden">
+
+<div class="authBox">
+
+<button
+class="gray"
+onclick="backToRoles()">
+← Back
+</button>
+
+<h2 id="userAuthTitle">
+Iyandikishe
+</h2>
+
 <div id="registerFields">
-<input id="fullName" placeholder="Amazina yose">
-<input id="phone" placeholder="Telephone">
-<input id="email" type="email" placeholder="Email">
-<input id="username" placeholder="Username">
-<input id="regPin" type="password" inputmode="numeric" placeholder="PIN (4-8 digits)">
-</div>
-<input id="identity" class="hidden" placeholder="Username cyangwa telephone">
-<input id="loginPin" class="hidden" type="password" inputmode="numeric" placeholder="PIN">
-<button onclick="submitAuth()" id="authBtn">Register</button>
-<button class="gray" onclick="toggleAuth()" id="switchBtn">Mfite konti: Login</button>
+
+<input
+id="fullName"
+placeholder="Amazina yose">
+
+<input
+id="phone"
+placeholder="Telephone">
+
+<input
+id="email"
+type="email"
+placeholder="Email">
+
+<input
+id="username"
+placeholder="Username">
+
+<input
+id="regPin"
+type="password"
+inputmode="numeric"
+placeholder="PIN (4-8 digits)">
+
 </div>
 
-<div id="profile" class="card hidden">
-<h3>Profile Settings</h3>
-<input id="newUsername" placeholder="Username nshya">
-<input id="photoUrl" placeholder="Profile photo URL (Google Drive cyangwa image URL)">
-<button onclick="saveProfile()">Save profile</button>
-<button class="gray" onclick="closeSettings()">Close</button>
+<input
+id="identity"
+class="hidden"
+placeholder="Username, Email cyangwa Telephone">
+
+<input
+id="loginPin"
+type="password"
+inputmode="numeric"
+class="hidden"
+placeholder="PIN">
+
+<button
+id="userAuthButton"
+onclick="submitUserAuth()">
+Register
+</button>
+
+<button
+class="gray"
+id="userSwitchButton"
+onclick="toggleUserAuth()">
+Mfite konti: Login
+</button>
+
+<div
+id="userAuthMessage"
+class="muted">
 </div>
 
-<div id="app" class="hidden">
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     PENDING PAGE
+====================================================== -->
+
+<div id="pendingPage"
+class="card hidden">
+
+<div class="statusBox">
+
+<div class="pendingIcon">⏳</div>
+
+<h2>Konti yawe iracyategereje kwemezwa</h2>
+
+<p>
+Registration yawe yakiriwe neza.
+</p>
+
+<p>
+Admin wa NASHO Health Center yamaze
+kumenyeshwa kuri email.
+</p>
+
+<div class="successBox">
+<strong>Admin email:</strong><br>
+nsabimanapierre16@gmail.com
+</div>
+
+<p class="muted">
+Ukimara kwemezwa, ushobora kongera Login.
+</p>
+
+<button
+class="red"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     USER APP
+====================================================== -->
+
+<div id="userApp" class="hidden">
+
 <div class="card">
+
+<div class="top">
+
+<div>
+
 <h2>Ohereza ubutumwa bushya</h2>
-<textarea id="message" maxlength="5000" placeholder="Andika ubutumwa bwawe..."></textarea>
-<div class="row"><input id="file" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"><button onclick="postMessage()">Ohereza</button></div>
-<div class="small">File yemerewe kugeza kuri 8 MB. File ibanza koherezwa nyuma y'ubutumwa.</div>
+
+<div class="muted" id="userWelcome"></div>
+
 </div>
-<div class="card"><div class="top"><h2>Ibiganiro</h2><button class="secondary" onclick="load()">Refresh</button></div><div id="feed">Loading...</div></div>
+
 </div>
+
+<textarea
+id="message"
+maxlength="5000"
+placeholder="Andika ubutumwa bwawe...">
+</textarea>
+
+<div class="row">
+
+<input
+id="file"
+type="file"
+accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+
+<button onclick="postMessage()">
+Ohereza
+</button>
+
 </div>
+
+<div class="small">
+File yemerewe kugeza kuri 8 MB.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="top">
+
+<h2>Ibiganiro</h2>
+
+<button
+class="blue"
+onclick="loadDiscussions()">
+Refresh
+</button>
+
+</div>
+
+<div id="feed">
+Loading...
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     SETTINGS
+====================================================== -->
+
+<div id="settingsPage"
+class="card hidden">
+
+<div class="authBox">
+
+<h2>⚙ Profile Settings</h2>
+
+<input
+id="newUsername"
+placeholder="Username nshya">
+
+<input
+id="photoUrl"
+placeholder="Profile photo URL">
+
+<div class="actions">
+
+<button onclick="saveProfile()">
+Save profile
+</button>
+
+<button
+class="gray"
+onclick="closeSettings()">
+Close
+</button>
+
+<button
+class="red"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN LOGIN
+====================================================== -->
+
+<div id="adminLoginPage"
+class="card hidden">
+
+<div class="authBox">
+
+<button
+class="gray"
+onclick="backToRoles()">
+← Back
+</button>
+
+<h2>🔐 Admin Login</h2>
+
+<p class="muted">
+NASHO Health Center Administration
+</p>
+
+<input
+id="adminUsername"
+placeholder="Admin username">
+
+<input
+id="adminPassword"
+type="password"
+placeholder="Admin password">
+
+<button
+class="blue"
+onclick="adminLogin()">
+Login as Admin
+</button>
+
+<div
+id="adminLoginMessage"
+class="muted">
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN DASHBOARD
+====================================================== -->
+
+<div id="adminDashboard" class="hidden">
+
+<div class="card">
+
+<div class="top">
+
+<div>
+
+<h1>NASHO Health Center</h1>
+
+<p>
+Admin Dashboard — Discussion Board
+</p>
+
+</div>
+
+<div class="actions">
+
+<button
+class="blue"
+onclick="loadAdminDashboard()">
+↻ Refresh
+</button>
+
+<button
+class="red"
+onclick="adminLogout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- STATISTICS -->
+
+<div class="stats">
+
+<div class="stat">
+<div class="muted">Total Users</div>
+<div class="statNumber" id="totalUsers">0</div>
+</div>
+
+<div class="stat">
+<div class="muted">Pending</div>
+<div class="statNumber" id="pendingUsers">0</div>
+</div>
+
+<div class="stat">
+<div class="muted">Approved</div>
+<div class="statNumber" id="approvedUsers">0</div>
+</div>
+
+<div class="stat">
+<div class="muted">Rejected</div>
+<div class="statNumber" id="rejectedUsers">0</div>
+</div>
+
+<div class="stat">
+<div class="muted">Discussions</div>
+<div class="statNumber" id="totalDiscussions">0</div>
+</div>
+
+</div>
+
+
+<!-- PENDING -->
+
+<div class="card">
+
+<h2>🔔 Abasaba kwinjira</h2>
+
+<div id="pendingUsersList">
+Loading...
+</div>
+
+</div>
+
+
+<!-- ALL USERS -->
+
+<div class="card">
+
+<h2>👥 Abakoresha bose</h2>
+
+<div class="tableWrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Username</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="usersBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- DISCUSSIONS -->
+
+<div class="card">
+
+<h2>💬 Discussions</h2>
+
+<div id="adminDiscussions">
+Loading...
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZtnVbNNHTGMuRtF6BFa9vBT8R6iZ4xccNS5sBQRNgm5c/exec";
-let token=localStorage.getItem("nashoToken")||"", user=JSON.parse(localStorage.getItem("nashoUser")||"null"), registerMode=true;
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+/* =====================================================
+   API
+====================================================== */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbypGPs7EwMgmFAbSpxj4auBZtnVbNNHTGMuRtF6BFa9vBT8R6iZ4xccNS5sBQRNgm5c/exec";
+
+
+/* =====================================================
+   STATE
+====================================================== */
+
+let token =
+localStorage.getItem("nashoToken") || "";
+
+let user =
+JSON.parse(
+localStorage.getItem("nashoUser") || "null"
+);
+
+let adminToken =
+localStorage.getItem("nashoAdminToken") || "";
+
+let userRegisterMode = true;
+
+
+/* =====================================================
+   HELPER
+====================================================== */
+
+const $ =
+id => document.getElementById(id);
+
+const esc =
+s =>
+String(s ?? "")
+.replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[c]));
+
+
+/* =====================================================
+   API FUNCTION
+====================================================== */
+
 async function api(action,data={}){
-  try{
-    const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...data})});
-    const text=await r.text();
-    try{return JSON.parse(text)}
-    catch(e){return {success:false,message:"API ntiyagaruye JSON. Reba Web app deployment na access ya Anyone."}}
-  }catch(e){return {success:false,message:"Ntibyashobotse guhuza na server: "+e.message}}
+
+try{
+
+const response =
+await fetch(
+API_URL,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"text/plain;charset=utf-8"
+},
+body:JSON.stringify({
+action,
+...data
+})
 }
-function toggleAuth(){registerMode=!registerMode;$("registerFields").classList.toggle("hidden",!registerMode);$("identity").classList.toggle("hidden",registerMode);$("loginPin").classList.toggle("hidden",registerMode);$("authTitle").textContent=registerMode?"Iyandikishe":"Login";$("authBtn").textContent=registerMode?"Register":"Login";$("switchBtn").textContent=registerMode?"Mfite konti: Login":"Nta konti mfite: Register"}
-async function submitAuth(){
-  $("authBtn").disabled=true;
-  $("authBtn").textContent="Birategere...";
-  let r;
-  if(registerMode){
-    const fullName=$("fullName").value.trim(), phone=$("phone").value.trim(), email=$("email").value.trim(), username=$("username").value.trim(), pin=$("regPin").value.trim();
-    if(!fullName||!phone||!email||!username||!pin){
-      $("authBtn").disabled=false; $("authBtn").textContent="Register";
-      return alert("Uzuza ibisabwa byose.");
-    }
-    if(!/^\d{4,8}$/.test(pin)){
-      $("authBtn").disabled=false; $("authBtn").textContent="Register";
-      return alert("PIN igomba kuba imibare 4 kugeza kuri 8.");
-    }
-    r=await api("register",{fullName,phone,email,username,pin});
-  }else{
-    r=await api("login",{identity:$("identity").value.trim(),pin:$("loginPin").value.trim()});
-  }
-  $("authBtn").disabled=false;
-  $("authBtn").textContent=registerMode?"Register":"Login";
-  if(!r.success)return alert(r.message||"Igikorwa cyananiwe.");
-  token=r.token; user=r.user;
-  localStorage.setItem("nashoToken",token);
-  localStorage.setItem("nashoUser",JSON.stringify(user));
-  showApp();
+);
+
+const text =
+await response.text();
+
+try{
+
+return JSON.parse(text);
+
+}catch(e){
+
+return {
+success:false,
+message:
+"API ntiyagaruye JSON."
+};
+
 }
-function showApp(){$("auth").classList.add("hidden");$("app").classList.remove("hidden");$("welcome").textContent="Murakaza neza, "+(user?.username||"");load()}
-async function logout(){if(token)await api("logout",{token});token="";user=null;localStorage.removeItem("nashoToken");localStorage.removeItem("nashoUser");location.reload()}
-function openSettings(){$("profile").classList.remove("hidden");$("newUsername").value=user?.username||"";$("photoUrl").value=user?.photoUrl||""}
-function closeSettings(){$("profile").classList.add("hidden")}
-async function saveProfile(){let r=await api("profile",{token,username:$("newUsername").value,photoUrl:$("photoUrl").value});if(!r.success)return alert(r.message);user=r.user;localStorage.setItem("nashoUser",JSON.stringify(user));closeSettings();showApp()}
-async function postMessage(){let message=$("message").value.trim();if(!message)return alert("Andika ubutumwa.");let r=await api("postDiscussion",{token,message});if(!r.success)return alert(r.message);let f=$("file").files[0];if(f){if(f.size>8*1024*1024)return alert("File irenze 8 MB.");let base64=await toBase64(f);let u=await api("uploadAttachment",{token,discussionId:r.id,fileName:f.name,mimeType:f.type,base64:base64.split(",")[1]});if(!u.success)alert(u.message)}$("message").value="";$("file").value="";load()}
-function toBase64(file){return new Promise((res,rej)=>{let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
-async function load(){
-  $("feed").textContent="Loading...";
-  try{
-    let r=await fetch(API_URL+"?action=getDiscussions");
-    let d=await r.json();
-    if(!d.success)return $("feed").textContent=d.message||"Nta makuru yabonetse.";$("feed").innerHTML=d.discussions.map(x=>`<div class="disc"><div class="user"><img class="avatar" src="${esc(x.photoUrl||"https://via.placeholder.com/42")}"><div><b>${esc(x.username)}</b><div class="small">${esc(x.timestamp)}</div></div></div><p>${esc(x.message)}</p>${(x.attachments||[]).map(a=>`<p><a href="${esc(a.url)}" target="_blank">${esc(a.name)}</a></p>`).join("")}${(x.replies||[]).map(y=>`<div class="reply"><b>${esc(y.username)}</b>: ${esc(y.reply)}<div class="small">${esc(y.timestamp)}</div></div>`).join("")}<div class="row"><input id="rep_${esc(x.id)}" placeholder="Andika igisubizo..."><button onclick="reply('${esc(x.id)}')">Subiza</button></div></div>`).join("")||"Nta butumwa buraboneka.";
-  }catch(e){$("feed").textContent="Kubona ibiganiro byanze: "+e.message;}
+
+}catch(e){
+
+return {
+success:false,
+message:
+"Network/server error: " +
+e.message
+};
+
 }
-async function reply(id){let input=$("rep_"+id),reply=input.value.trim();if(!reply)return;let r=await api("replyDiscussion",{token,discussionId:id,reply});if(!r.success)return alert(r.message);input.value="";load()}
-function changeLang(v){localStorage.setItem("nashoLanguage",v);/* Add translation labels here if needed. */}
-if(token&&user)showApp();else $("auth").classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   ROLE SELECTION
+====================================================== */
+
+function selectRole(role){
+
+$("rolePage")
+.classList
+.add("hidden");
+
+if(role === "user"){
+
+$("userAuthPage")
+.classList
+.remove("hidden");
+
+}else{
+
+$("adminLoginPage")
+.classList
+.remove("hidden");
+
+}
+
+}
+
+
+function backToRoles(){
+
+$("rolePage")
+.classList
+.remove("hidden");
+
+$("userAuthPage")
+.classList
+.add("hidden");
+
+$("adminLoginPage")
+.classList
+.add("hidden");
+
+$("pendingPage")
+.classList
+.add("hidden");
+
+$("adminDashboard")
+.classList
+.add("hidden");
+
+}
+
+
+/* =====================================================
+   USER LOGIN/REGISTER TOGGLE
+====================================================== */
+
+function toggleUserAuth(){
+
+userRegisterMode =
+!userRegisterMode;
+
+$("registerFields")
+.classList
+.toggle(
+"hidden",
+!userRegisterMode
+);
+
+$("identity")
+.classList
+.toggle(
+"hidden",
+userRegisterMode
+);
+
+$("loginPin")
+.classList
+.toggle(
+"hidden",
+userRegisterMode
+);
+
+$("userAuthTitle")
+.textContent =
+userRegisterMode
+? "Iyandikishe"
+: "Login";
+
+$("userAuthButton")
+.textContent =
+userRegisterMode
+? "Register"
+: "Login";
+
+$("userSwitchButton")
+.textContent =
+userRegisterMode
+? "Mfite konti: Login"
+: "Nta konti mfite: Register";
+
+}
+
+
+/* =====================================================
+   USER AUTH
+====================================================== */
+
+async function submitUserAuth(){
+
+const button =
+$("userAuthButton");
+
+button.disabled = true;
+
+button.textContent =
+"Birategere...";
+
+
+let result;
+
+
+if(userRegisterMode){
+
+const fullName =
+$("fullName").value.trim();
+
+const phone =
+$("phone").value.trim();
+
+const email =
+$("email").value.trim();
+
+const username =
+$("username").value.trim();
+
+const pin =
+$("regPin").value.trim();
+
+
+if(
+!fullName ||
+!phone ||
+!email ||
+!username ||
+!pin
+){
+
+alert(
+"Uzuza ibisabwa byose."
+);
+
+resetUserButton();
+
+return;
+}
+
+
+if(!/^\d{4,8}$/.test(pin)){
+
+alert(
+"PIN igomba kuba imibare 4 kugeza kuri 8."
+);
+
+resetUserButton();
+
+return;
+}
+
+
+result =
+await api(
+"register",
+{
+fullName,
+phone,
+email,
+username,
+pin
+}
+);
+
+
+}else{
+
+result =
+await api(
+"login",
+{
+identity:
+$("identity").value.trim(),
+
+pin:
+$("loginPin").value.trim()
+}
+);
+
+}
+
+
+resetUserButton();
+
+
+if(!result.success){
+
+if(result.pending){
+
+showPending();
+
+return;
+}
+
+alert(
+result.message ||
+"Igikorwa cyananiwe."
+);
+
+return;
+}
+
+
+/* REGISTER */
+
+if(result.pending){
+
+showPending();
+
+return;
+}
+
+
+/* APPROVED LOGIN */
+
+token =
+result.token;
+
+user =
+result.user;
+
+localStorage.setItem(
+"nashoToken",
+token
+);
+
+localStorage.setItem(
+"nashoUser",
+JSON.stringify(user)
+);
+
+showUserApp();
+
+}
+
+
+function resetUserButton(){
+
+$("userAuthButton").disabled=false;
+
+$("userAuthButton").textContent =
+userRegisterMode
+? "Register"
+: "Login";
+
+}
+
+
+/* =====================================================
+   PENDING
+====================================================== */
+
+function showPending(){
+
+$("userAuthPage")
+.classList
+.add("hidden");
+
+$("rolePage")
+.classList
+.add("hidden");
+
+$("pendingPage")
+.classList
+.remove("hidden");
+
+}
+
+
+/* =====================================================
+   USER APP
+====================================================== */
+
+function showUserApp(){
+
+$("rolePage")
+.classList
+.add("hidden");
+
+$("userAuthPage")
+.classList
+.add("hidden");
+
+$("pendingPage")
+.classList
+.add("hidden");
+
+$("adminLoginPage")
+.classList
+.add("hidden");
+
+$("adminDashboard")
+.classList
+.add("hidden");
+
+$("userApp")
+.classList
+.remove("hidden");
+
+$("headerSettings")
+.classList
+.remove("hidden");
+
+$("headerLogout")
+.classList
+.remove("hidden");
+
+$("userWelcome").textContent =
+"Murakaza neza, " +
+(user?.username || "");
+
+$("headerText").textContent =
+"Murakaza neza, " +
+(user?.username || "");
+
+loadDiscussions();
+
+}
+
+
+/* =====================================================
+   USER LOGOUT
+====================================================== */
+
+async function logout(){
+
+if(token){
+
+await api(
+"logout",
+{
+token
+}
+);
+
+}
+
+token="";
+
+user=null;
+
+localStorage.removeItem(
+"nashoToken"
+);
+
+localStorage.removeItem(
+"nashoUser"
+);
+
+location.reload();
+
+}
+
+
+/* =====================================================
+   SETTINGS
+====================================================== */
+
+function openSettings(){
+
+$("settingsPage")
+.classList
+.remove("hidden");
+
+$("newUsername").value =
+user?.username || "";
+
+$("photoUrl").value =
+user?.photoUrl || "";
+
+$("userApp")
+.classList
+.add("hidden");
+
+}
+
+
+function closeSettings(){
+
+$("settingsPage")
+.classList
+.add("hidden");
+
+$("userApp")
+.classList
+.remove("hidden");
+
+}
+
+
+async function saveProfile(){
+
+const result =
+await api(
+"profile",
+{
+token,
+
+username:
+$("newUsername").value.trim(),
+
+photoUrl:
+$("photoUrl").value.trim()
+}
+);
+
+
+if(!result.success){
+
+alert(result.message);
+
+return;
+}
+
+
+user =
+result.user;
+
+localStorage.setItem(
+"nashoUser",
+JSON.stringify(user)
+);
+
+closeSettings();
+
+showUserApp();
+
+}
+
+
+/* =====================================================
+   POST DISCUSSION
+====================================================== */
+
+async function postMessage(){
+
+const message =
+$("message").value.trim();
+
+
+if(!message){
+
+alert(
+"Andika ubutumwa."
+);
+
+return;
+}
+
+
+const result =
+await api(
+"postDiscussion",
+{
+token,
+message
+}
+);
+
+
+if(!result.success){
+
+alert(result.message);
+
+return;
+}
+
+
+const file =
+$("file").files[0];
+
+
+if(file){
+
+if(
+file.size >
+8 * 1024 * 1024
+){
+
+alert(
+"File irenze 8 MB."
+);
+
+return;
+}
+
+
+const base64 =
+await toBase64(file);
+
+
+const upload =
+await api(
+"uploadAttachment",
+{
+token,
+
+discussionId:
+result.id,
+
+fileName:
+file.name,
+
+mimeType:
+file.type,
+
+base64:
+base64.split(",")[1]
+}
+);
+
+
+if(!upload.success){
+
+alert(upload.message);
+
+}
+
+}
+
+
+$("message").value="";
+
+$("file").value="";
+
+loadDiscussions();
+
+}
+
+
+/* =====================================================
+   FILE
+====================================================== */
+
+function toBase64(file){
+
+return new Promise(
+(resolve,reject)=>{
+
+const reader =
+new FileReader();
+
+reader.onload =
+() => resolve(reader.result);
+
+reader.onerror =
+reject;
+
+reader.readAsDataURL(file);
+
+});
+
+}
+
+
+/* =====================================================
+   LOAD DISCUSSIONS
+====================================================== */
+
+async function loadDiscussions(){
+
+$("feed").textContent =
+"Loading...";
+
+
+try{
+
+const response =
+await fetch(
+API_URL +
+"?action=getDiscussions"
+);
+
+const data =
+await response.json();
+
+
+if(!data.success){
+
+$("feed").textContent =
+data.message ||
+"Nta makuru.";
+
+return;
+}
+
+
+$("feed").innerHTML =
+(data.discussions || [])
+.map(x=>`
+
+<div class="disc">
+
+<div class="user">
+
+<img
+class="avatar"
+src="${
+esc(
+x.photoUrl ||
+"https://via.placeholder.com/44"
+)
+}">
+
+<div>
+
+<b>
+${esc(x.username)}
+</b>
+
+<div class="small">
+${esc(x.timestamp)}
+</div>
+
+</div>
+
+</div>
+
+<p>
+${esc(x.message)}
+</p>
+
+${
+(x.attachments || [])
+.map(a=>`
+
+<p>
+<a
+href="${esc(a.url)}"
+target="_blank">
+
+📎 ${esc(a.name)}
+
+</a>
+</p>
+
+`)
+.join("")
+}
+
+${
+(x.replies || [])
+.map(y=>`
+
+<div class="reply">
+
+<b>
+${esc(y.username)}
+</b>:
+
+${esc(y.reply)}
+
+<div class="small">
+${esc(y.timestamp)}
+</div>
+
+</div>
+
+`)
+.join("")
+}
+
+<div class="row">
+
+<input
+id="rep_${esc(x.id)}"
+placeholder="Andika igisubizo...">
+
+<button
+onclick="replyDiscussion('${esc(x.id)}')">
+
+Subiza
+
+</button>
+
+</div>
+
+</div>
+
+`)
+.join("")
+||
+"Nta butumwa buraboneka.";
+
+
+}catch(error){
+
+$("feed").textContent =
+"Server error: " +
+error.message;
+
+}
+
+}
+
+
+/* =====================================================
+   REPLY
+====================================================== */
+
+async function replyDiscussion(id){
+
+const input =
+$("rep_"+id);
+
+const reply =
+input.value.trim();
+
+
+if(!reply)return;
+
+
+const result =
+await api(
+"replyDiscussion",
+{
+token,
+discussionId:id,
+reply
+}
+);
+
+
+if(!result.success){
+
+alert(result.message);
+
+return;
+}
+
+
+input.value="";
+
+loadDiscussions();
+
+}
+
+
+/* =====================================================
+   ADMIN LOGIN
+====================================================== */
+
+async function adminLogin(){
+
+const username =
+$("adminUsername")
+.value.trim();
+
+const password =
+$("adminPassword")
+.value;
+
+
+$("adminLoginMessage")
+textContent =
+"Birategere...";
+
+
+const result =
+await api(
+"adminLogin",
+{
+username,
+password
+}
+);
+
+
+if(!result.success){
+
+$("adminLoginMessage")
+textContent =
+result.message;
+
+return;
+}
+
+
+adminToken =
+result.token;
+
+localStorage.setItem(
+"nashoAdminToken",
+adminToken
+);
+
+
+$("adminLoginPage")
+.classList
+.add("hidden");
+
+$("rolePage")
+.classList
+.add("hidden");
+
+$("adminDashboard")
+.classList
+.remove("hidden");
+
+$("headerSettings")
+.classList
+.add("hidden");
+
+$("headerLogout")
+.classList
+.add("hidden");
+
+$("headerText").textContent =
+"Admin Dashboard";
+
+loadAdminDashboard();
+
+}
+
+
+/* =====================================================
+   ADMIN DASHBOARD
+====================================================== */
+
+async function loadAdminDashboard(){
+
+const result =
+await api(
+"getAdminData",
+{
+token:adminToken
+}
+);
+
+
+if(!result.success){
+
+alert(result.message);
+
+adminLogout();
+
+return;
+}
+
+
+const stats =
+result.statistics || {};
+
+
+$("totalUsers").textContent =
+stats.totalUsers || 0;
+
+$("pendingUsers").textContent =
+stats.pendingUsers || 0;
+
+$("approvedUsers").textContent =
+stats.approvedUsers || 0;
+
+$("rejectedUsers").textContent =
+stats.rejectedUsers || 0;
+
+$("totalDiscussions").textContent =
+stats.totalDiscussions || 0;
+
+
+renderPendingUsers(
+result.users || []
+);
+
+renderUsers(
+result.users || []
+);
+
+renderAdminDiscussions(
+result.discussions || []
+);
+
+}
+
+
+/* =====================================================
+   PENDING USERS
+====================================================== */
+
+function renderPendingUsers(users){
+
+const pending =
+users.filter(
+u => u.status === "PENDING"
+);
+
+
+if(!pending.length){
+
+$("pendingUsersList").innerHTML =
+`
+<div class="successBox">
+Nta user utegereje approval ubu.
+</div>
+`;
+
+return;
+}
+
+
+$("pendingUsersList").innerHTML =
+pending.map(u=>`
+
+<div class="adminDiscussion">
+
+<h3>
+${esc(u.fullName)}
+</h3>
+
+<p>
+<strong>Username:</strong>
+${esc(u.username)}
+</p>
+
+<p>
+<strong>Email:</strong>
+${esc(u.email)}
+</p>
+
+<p>
+<strong>Phone:</strong>
+${esc(u.phone)}
+</p>
+
+<p class="small">
+Registered:
+${esc(u.createdAt)}
+</p>
+
+<div class="actions">
+
+<button
+onclick="approveUser('${esc(u.id)}')">
+
+✓ ACCEPT
+
+</button>
+
+<button
+class="red"
+onclick="rejectUser('${esc(u.id)}')">
+
+✕ REJECT
+
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+/* =====================================================
+   ALL USERS
+====================================================== */
+
+function renderUsers(users){
+
+$("usersBody").innerHTML =
+users.map(u=>`
+
+<tr>
+
+<td>
+${esc(u.fullName)}
+</td>
+
+<td>
+${esc(u.username)}
+</td>
+
+<td>
+${esc(u.email)}
+</td>
+
+<td>
+${esc(u.phone)}
+</td>
+
+<td>
+
+<span class="badge ${
+u.status === "PENDING"
+? "pendingBadge"
+: u.status === "APPROVED"
+? "approvedBadge"
+: "rejectedBadge"
+}">
+
+${esc(u.status)}
+
+</span>
+
+</td>
+
+<td>
+
+<div class="actions">
+
+${
+u.status === "PENDING"
+? `
+
+<button
+onclick="approveUser('${esc(u.id)}')">
+
+Accept
+
+</button>
+
+<button
+class="red"
+onclick="rejectUser('${esc(u.id)}')">
+
+Reject
+
+</button>
+
+`
+: ""
+}
+
+<button
+class="red"
+onclick="deleteUser('${esc(u.id)}')">
+
+Delete
+
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+
+/* =====================================================
+   APPROVE
+====================================================== */
+
+async function approveUser(id){
+
+if(
+!confirm(
+"Urashaka kwemeza uyu mukoresha?"
+)
+)return;
+
+
+const result =
+await api(
+"approveUser",
+{
+token:adminToken,
+userId:id
+}
+);
+
+
+alert(
+result.message ||
+"User yemejwe."
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}
+
+}
+
+
+/* =====================================================
+   REJECT
+====================================================== */
+
+async function rejectUser(id){
+
+if(
+!confirm(
+"Urashaka kwanga uyu mukoresha?"
+)
+)return;
+
+
+const result =
+await api(
+"rejectUser",
+{
+token:adminToken,
+userId:id
+}
+);
+
+
+alert(
+result.message ||
+"User yanzwe."
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}
+
+}
+
+
+/* =====================================================
+   DELETE USER
+====================================================== */
+
+async function deleteUser(id){
+
+if(
+!confirm(
+"Urashaka gusiba uyu user burundu?"
+)
+)return;
+
+
+const result =
+await api(
+"deleteUser",
+{
+token:adminToken,
+userId:id
+}
+);
+
+
+alert(
+result.message ||
+"User yasibwe."
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}
+
+}
+
+
+/* =====================================================
+   ADMIN DISCUSSIONS
+====================================================== */
+
+function renderAdminDiscussions(items){
+
+if(!items.length){
+
+$("adminDiscussions").innerHTML =
+"Nta discussions ziraboneka.";
+
+return;
+}
+
+
+$("adminDiscussions").innerHTML =
+items.map(x=>`
+
+<div class="adminDiscussion">
+
+<div class="top">
+
+<div>
+
+<strong>
+${esc(x.username)}
+</strong>
+
+<div class="small">
+${esc(x.timestamp)}
+</div>
+
+</div>
+
+<span class="badge ${
+x.status === "VISIBLE"
+? "approvedBadge"
+: "hiddenBadge"
+}">
+
+${esc(x.status)}
+
+</span>
+
+</div>
+
+<div class="message"
+style="padding:12px;background:#f8fafc;border-radius:10px;margin:10px 0">
+
+${esc(x.message)}
+
+</div>
+
+<div class="actions">
+
+${
+x.status === "VISIBLE"
+
+?
+
+`<button
+class="orange"
+onclick="hideDiscussion('${esc(x.id)}')">
+
+Hide
+
+</button>`
+
+:
+
+`<button
+onclick="showDiscussion('${esc(x.id)}')">
+
+Show
+
+</button>`
+
+}
+
+<button
+class="red"
+onclick="deleteDiscussion('${esc(x.id)}')">
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+`)
+.join("");
+
+}
+
+
+/* =====================================================
+   HIDE
+====================================================== */
+
+async function hideDiscussion(id){
+
+const result =
+await api(
+"hideDiscussion",
+{
+token:adminToken,
+discussionId:id
+}
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}else{
+
+alert(result.message);
+
+}
+
+}
+
+
+/* =====================================================
+   SHOW
+====================================================== */
+
+async function showDiscussion(id){
+
+const result =
+await api(
+"showDiscussion",
+{
+token:adminToken,
+discussionId:id
+}
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}else{
+
+alert(result.message);
+
+}
+
+}
+
+
+/* =====================================================
+   DELETE DISCUSSION
+====================================================== */
+
+async function deleteDiscussion(id){
+
+if(
+!confirm(
+"Urashaka gusiba ubu butumwa?"
+)
+)return;
+
+
+const result =
+await api(
+"deleteDiscussion",
+{
+token:adminToken,
+discussionId:id
+}
+);
+
+
+alert(
+result.message ||
+"Done"
+);
+
+
+if(result.success){
+
+loadAdminDashboard();
+
+}
+
+}
+
+
+/* =====================================================
+   ADMIN LOGOUT
+====================================================== */
+
+async function adminLogout(){
+
+if(adminToken){
+
+await api(
+"adminLogout",
+{
+token:adminToken
+}
+);
+
+}
+
+adminToken="";
+
+localStorage.removeItem(
+"nashoAdminToken"
+);
+
+location.reload();
+
+}
+
+
+/* =====================================================
+   LANGUAGE
+====================================================== */
+
+function changeLanguage(language){
+
+localStorage.setItem(
+"nashoLanguage",
+language
+);
+
+}
+
+
+/* =====================================================
+   STARTUP
+====================================================== */
+
+async function startApplication(){
+
+/*
+  ADMIN SESSION
+*/
+
+if(adminToken){
+
+const result =
+await api(
+"getAdminData",
+{
+token:adminToken
+}
+);
+
+if(result.success){
+
+$("rolePage")
+.classList
+.add("hidden");
+
+$("adminDashboard")
+.classList
+.remove("hidden");
+
+loadAdminDashboard();
+
+return;
+
+}else{
+
+localStorage.removeItem(
+"nashoAdminToken"
+);
+
+adminToken="";
+
+}
+
+}
+
+
+/*
+  USER SESSION
+*/
+
+if(token && user){
+
+const result =
+await api(
+"checkSession",
+{
+token
+}
+);
+
+if(result.success){
+
+user =
+result.user;
+
+localStorage.setItem(
+"nashoUser",
+JSON.stringify(user)
+);
+
+showUserApp();
+
+return;
+
+}
+
+localStorage.removeItem(
+"nashoToken"
+);
+
+localStorage.removeItem(
+"nashoUser"
+);
+
+token="";
+
+user=null;
+
+}
+
+
+/*
+  DEFAULT
+*/
+
+$("rolePage")
+.classList
+.remove("hidden");
+
+}
+
+
+/* START */
+
+startApplication();
+
 </script>
+
 </body>
 </html>
+
